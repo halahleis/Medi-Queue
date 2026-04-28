@@ -1,0 +1,446 @@
+/* =========================================================================
+   Patient-facing pages — Prescripto-inspired clean styling
+   ========================================================================= */
+
+.patient-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+.patient-page {
+  padding: 32px 28px 48px;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* ---------------------------- Hero ---------------------------- */
+.hero {
+  background: var(--primary);
+  color: white;
+  border-radius: var(--radius-lg);
+  padding: 48px 56px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 24px;
+  margin-bottom: 36px;
+  position: relative;
+  overflow: hidden;
+}
+.hero h1 {
+  font-size: 36px;
+  font-weight: 600;
+  line-height: 1.2;
+  margin: 0 0 12px;
+  letter-spacing: -0.02em;
+}
+.hero p {
+  font-size: 14px;
+  margin: 0 0 22px;
+  opacity: 0.9;
+  max-width: 380px;
+}
+.hero .btn {
+  background: white;
+  color: var(--text);
+  font-weight: 500;
+}
+.hero .btn:hover { background: #F3F4F6; }
+.hero-illustration {
+  width: 220px;
+  height: 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 50%;
+  font-size: 100px;
+  align-self: center;
+}
+
+/* ------------------------- Section heading ------------------------- */
+.section-title {
+  text-align: center;
+  margin: 36px 0 24px;
+}
+.section-title h2 {
+  font-size: 26px;
+  font-weight: 600;
+  margin: 0 0 6px;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+.section-title p {
+  color: var(--text-muted);
+  font-size: 14px;
+  margin: 0;
+}
+
+/* ---------------------------- Specialty grid ---------------------------- */
+.specialty-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 16px;
+  margin-bottom: 40px;
+}
+.specialty-card {
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius);
+  padding: 20px 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s;
+}
+.specialty-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+  border-color: var(--primary);
+}
+.specialty-card .icon {
+  width: 60px;
+  height: 60px;
+  margin: 0 auto 10px;
+  background: var(--primary-light);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+}
+.specialty-card .name {
+  font-size: 13px;
+  color: var(--text);
+  font-weight: 500;
+}
+.specialty-card.active {
+  border-color: var(--primary);
+  background: var(--primary-light);
+}
+
+/* ---------------------------- Doctor grid ---------------------------- */
+.doctor-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 18px;
+}
+.doctor-card {
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius);
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.doctor-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow);
+}
+.doctor-card .avatar-wrap {
+  background: var(--primary-light);
+  height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 80px;
+  color: var(--primary);
+}
+.doctor-card .body {
+  padding: 14px 16px;
+}
+.doctor-card .availability {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--success);
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+.doctor-card .availability::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  background: var(--success);
+  border-radius: 50%;
+}
+.doctor-card .name {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0 0 2px;
+}
+.doctor-card .specialty {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* ---------------------------- Doctor detail page ---------------------------- */
+.doctor-detail {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 28px;
+  margin-bottom: 32px;
+}
+.doctor-detail .photo {
+  background: var(--primary);
+  height: 280px;
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 110px;
+  color: white;
+}
+.doctor-detail .info-card {
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius);
+  padding: 22px 26px;
+}
+.doctor-detail h1 {
+  font-size: 24px;
+  font-weight: 600;
+  margin: 0 0 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.doctor-detail .verified {
+  color: var(--primary);
+  font-size: 14px;
+}
+.doctor-detail .qual {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 18px;
+}
+.doctor-detail .bio-title {
+  font-size: 13px;
+  font-weight: 600;
+  margin: 18px 0 6px;
+}
+.doctor-detail .bio {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.55;
+}
+.doctor-detail .fee {
+  margin-top: 18px;
+  font-size: 14px;
+}
+
+/* ---------------------------- Slot picker ---------------------------- */
+.slots-section {
+  margin-top: 28px;
+}
+.slots-section h3 {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-muted);
+  margin: 0 0 14px;
+}
+.day-strip {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  margin-bottom: 18px;
+  padding-bottom: 4px;
+}
+.day-pill {
+  flex: 0 0 auto;
+  width: 60px;
+  padding: 12px 0;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.day-pill .dow { font-size: 11px; color: var(--text-muted); text-transform: uppercase; }
+.day-pill .num { font-size: 18px; font-weight: 600; margin-top: 2px; }
+.day-pill.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+.day-pill.active .dow { color: rgba(255, 255, 255, 0.85); }
+.time-slot-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.time-slot {
+  padding: 8px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  font-size: 13px;
+  color: var(--text);
+  cursor: pointer;
+  font-variant-numeric: tabular-nums;
+  transition: all 0.15s ease;
+}
+.time-slot:hover:not(:disabled) {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+.time-slot.selected {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+.time-slot:disabled {
+  background: var(--border-soft);
+  color: var(--text-soft);
+  cursor: not-allowed;
+  text-decoration: line-through;
+}
+
+/* ---------------------------- My Appointments ---------------------------- */
+.appt-list { display: flex; flex-direction: column; gap: 14px; }
+.appt-card {
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius);
+  padding: 18px;
+  display: grid;
+  grid-template-columns: 80px 1fr auto;
+  gap: 18px;
+  align-items: center;
+}
+.appt-card .photo {
+  background: var(--primary-light);
+  border-radius: var(--radius-sm);
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36px;
+  color: var(--primary);
+}
+.appt-card .info { font-size: 13px; }
+.appt-card .info .doc-name { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+.appt-card .info .specialty { color: var(--text-muted); margin-bottom: 6px; }
+.appt-card .info .when {
+  margin-top: 8px;
+  font-size: 13px;
+}
+.appt-card .info .when strong { color: var(--text); }
+.appt-card .actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-end;
+}
+
+/* ---------------------------- Live status tracker ---------------------------- */
+.live-banner {
+  background: linear-gradient(135deg, var(--primary), #8b96ff);
+  color: white;
+  border-radius: var(--radius-lg);
+  padding: 22px 26px;
+  margin-bottom: 24px;
+}
+.live-banner .label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  opacity: 0.85;
+  margin-bottom: 6px;
+}
+.live-banner h2 {
+  margin: 0 0 4px;
+  font-size: 22px;
+  font-weight: 600;
+}
+.progress-bar {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+  margin-top: 16px;
+}
+.progress-step {
+  background: rgba(255, 255, 255, 0.2);
+  height: 6px;
+  border-radius: var(--radius-pill);
+}
+.progress-step.done { background: white; }
+.progress-labels {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+  margin-top: 6px;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  opacity: 0.85;
+}
+
+/* ---------------------------- Notifications panel ---------------------------- */
+.notif-panel {
+  position: fixed;
+  top: 70px;
+  right: 28px;
+  width: 360px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  z-index: 80;
+  max-height: 480px;
+  display: flex;
+  flex-direction: column;
+}
+.notif-panel-header {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border-soft);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.notif-panel-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+}
+.notif-item {
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 6px;
+  background: var(--bg);
+}
+.notif-item .title { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+.notif-item .msg   { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+.notif-item .time  { font-size: 10px; color: var(--text-soft); margin-top: 4px; }
+
+/* ---------------------------- Profile page ---------------------------- */
+.profile-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+/* ---------------------------- Booking modal ---------------------------- */
+.hold-timer {
+  display: inline-block;
+  padding: 4px 10px;
+  background: var(--warning-bg);
+  color: #B45309;
+  border-radius: var(--radius-pill);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+.fee-summary {
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  margin: 14px 0;
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+}
+.fee-summary .label { color: var(--text-muted); }
+.fee-summary .value { font-weight: 600; }
+.fee-summary.followup .value { color: var(--success); }
