@@ -10,6 +10,7 @@ const staffRoutes = require('./routes/staffRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const patientRoutes = require('./routes/patientRoutes');
 const publicRoutes = require('./routes/publicRoutes');
+const doctorRoutes = require('./routes/doctorRoutes');
 const { errorHandler } = require('./middleware/errorHandler');
 const { initSocket } = require('./sockets/init');
 const { pool } = require('./config/db');
@@ -32,6 +33,7 @@ app.use('/api/public', publicRoutes);
 app.use('/api/staff', staffRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/patient', patientRoutes);
+app.use('/api/doctor', doctorRoutes);
 
 // 404
 app.use((req, res) => res.status(404).json({ message: `Not found: ${req.method} ${req.path}` }));

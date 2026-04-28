@@ -1,0 +1,183 @@
+/* =========================================================================
+   Doctor workspace
+   ========================================================================= */
+
+.doctor-page {
+  padding: 24px 28px 40px;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.doctor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 18px;
+}
+.doctor-header h1 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+/* "Next patient" hero card on dashboard */
+.next-card {
+  background: linear-gradient(135deg, var(--primary), #8b96ff);
+  color: white;
+  padding: 24px 28px;
+  border-radius: var(--radius-lg);
+  margin-bottom: 22px;
+}
+.next-card .label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  opacity: 0.85;
+  margin-bottom: 6px;
+}
+.next-card .name {
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.next-card .when {
+  font-size: 14px;
+  opacity: 0.9;
+  margin-top: 6px;
+}
+
+/* Doctor's queue board: simpler kanban — only 3 columns matter to the doctor */
+.doc-board {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+.doc-col {
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  min-height: 140px;
+}
+.doc-col h4 {
+  margin: 0 0 10px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.doc-col .count {
+  background: var(--border-soft);
+  color: var(--text-muted);
+  font-size: 11px;
+  padding: 1px 8px;
+  border-radius: var(--radius-pill);
+  font-weight: 700;
+}
+
+/* Compact patient cards in the doctor's column */
+.doc-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: border-color 0.15s ease, transform 0.1s ease;
+}
+.doc-card:hover {
+  border-color: var(--primary);
+  transform: translateX(2px);
+}
+.doc-card.in_consultation { background: var(--success-bg); border-color: #86EFAC; }
+.doc-card.completed       { background: #F3F4F6; }
+
+.doc-card .dc-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+.doc-card .dc-name { font-weight: 600; font-size: 13px; }
+.doc-card .dc-time { font-size: 11px; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+.doc-card .dc-meta { font-size: 11px; color: var(--text-muted); }
+
+/* Consultation drawer / modal — wide enough for two columns */
+.consult-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+/* Profile section */
+.profile-section {
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  margin-bottom: 12px;
+}
+.profile-section h4 {
+  margin: 0 0 8px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+.profile-section p,
+.profile-section dd {
+  font-size: 13px;
+  margin: 0;
+  line-height: 1.55;
+  white-space: pre-wrap;
+}
+.profile-section dl {
+  margin: 0;
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  gap: 6px 12px;
+  font-size: 13px;
+}
+.profile-section dt { color: var(--text-muted); }
+
+/* Schedule grid: a row per day */
+.sched-row {
+  display: grid;
+  grid-template-columns: 100px 1fr 1fr 100px;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border-soft);
+}
+.sched-row:last-child { border-bottom: none; }
+.sched-row .day { font-weight: 500; text-transform: capitalize; }
+.sched-row .input { padding: 6px 10px; font-size: 13px; }
+
+/* Prescription chip list */
+.rx-chip {
+  background: var(--primary-light);
+  color: var(--primary-dark);
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 13px;
+}
+.rx-chip .rx-name { font-weight: 600; }
+.rx-chip .rx-dose { font-size: 11px; opacity: 0.85; margin-top: 2px; }
+
+/* History timeline */
+.history-row {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border-soft);
+  font-size: 13px;
+}
+.history-row:last-child { border-bottom: none; }
+.history-row .when { color: var(--text-muted); font-size: 11px; }

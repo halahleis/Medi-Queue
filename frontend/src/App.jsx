@@ -4,6 +4,7 @@ import LoginPage from './pages/LoginPage.jsx';
 import RegisterPage from './pages/RegisterPage.jsx';
 import StaffWorkspace from './pages/StaffWorkspace.jsx';
 import AdminWorkspace from './pages/AdminWorkspace.jsx';
+import DoctorWorkspace from './pages/DoctorWorkspace.jsx';
 import PatientLayout from './pages/patient/PatientLayout.jsx';
 import HomePage from './pages/patient/HomePage.jsx';
 import AllDoctorsPage from './pages/patient/AllDoctorsPage.jsx';
@@ -25,6 +26,7 @@ const HomeRedirect = () => {
   if (!user) return <Navigate to="/home" replace />;
   if (user.role === 'staff') return <Navigate to="/staff" replace />;
   if (user.role === 'admin') return <Navigate to="/admin" replace />;
+  if (user.role === 'doctor') return <Navigate to="/doctor" replace />;
   if (user.role === 'patient') return <Navigate to="/home" replace />;
   return <Navigate to="/login" replace />;
 };
@@ -61,6 +63,10 @@ export default function App() {
       <Route
         path="/admin/*"
         element={<RequireRole role="admin"><AdminWorkspace /></RequireRole>}
+      />
+      <Route
+        path="/doctor/*"
+        element={<RequireRole role="doctor"><DoctorWorkspace /></RequireRole>}
       />
 
       <Route path="/" element={<HomeRedirect />} />

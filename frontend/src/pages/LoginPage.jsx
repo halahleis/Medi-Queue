@@ -18,8 +18,8 @@ export default function LoginPage() {
       toast.success(`Welcome, ${user.fullName || user.email}`);
       if (user.role === 'staff') nav('/staff');
       else if (user.role === 'admin') nav('/admin');
+      else if (user.role === 'doctor') nav('/doctor');
       else if (user.role === 'patient') nav('/home');
-      else toast('Doctor perspective not yet implemented.');
     } catch (err) {
       toast.error(err.displayMessage || 'Login failed.');
     } finally {

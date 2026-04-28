@@ -8,6 +8,7 @@ import './styles/global.css';
 import './styles/staff.css';
 import './styles/admin.css';
 import './styles/patient.css';
+import './styles/doctor.css';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
