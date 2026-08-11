@@ -121,13 +121,15 @@ From `backend`:
 npm run seed
 ```
 
-The seed creates 16 departments, 48 doctors, department staff assignments, and an admin. It resets existing application data, so only run it against a development database.
+The seed creates 16 departments, 48 doctors, 32 staff accounts, and one admin account. Each department has three doctors and two staff members: one staff member is assigned to two doctors and the other is assigned to the remaining doctor. Database rules also ensure that staff can only handle doctors in their own department and can never be assigned more than two doctors.
+
+The seed resets existing application data, so only run it against a development database.
 
 Demo password for all seeded accounts: `Password123!`
 
-- Staff: `maria@mediqueue.test`
+- Example staff login: `maria@mediqueue.test`
 - Admin: `admin@mediqueue.test`
-- Doctor account emails are printed by the seed command
+- All remaining staff and doctor account emails, together with their assignments, are printed by the seed command
 
 ### 5. Run the backend
 
