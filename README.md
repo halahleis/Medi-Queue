@@ -176,4 +176,4 @@ npm run preview
 
 ## License
 
-No license has been added yet. Until one is chosen, normal copyright restrictions apply.
+This project is released under the [MIT License](LICENSE).
