@@ -113,8 +113,6 @@ CLIENT_URL=http://localhost:5173
 
 SMTP settings are optional for the rest of the application, but they are required for the password-reset email flow.
 
-> Never commit `backend/.env`. It is ignored by Git; only the placeholder `.env.example` belongs in the repository.
-
 ### 4. Seed demo data
 
 From `backend`:
