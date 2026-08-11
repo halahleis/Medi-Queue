@@ -8,25 +8,43 @@ MediQueue is a full-stack hospital appointment and live queue management system.
 
 Patients can browse the hospital's specialties and start an appointment booking.
 
-![MediQueue patient home](docs/screenshots/patient-home.png)
+![MediQueue patient home](docs/screenshots/01-patient-home.png)
 
 ### Doctor directory
 
 The directory can be filtered by specialty and shows each doctor's availability.
 
-![MediQueue doctor directory](docs/screenshots/doctor-directory.png)
+![MediQueue doctor directory](docs/screenshots/02-doctor-directory.png)
 
-### Doctor profile and booking
+### Appointment booking
 
-Patients can review a doctor's profile, select a date and time, and book an appointment.
+Patients can select a time, choose a payment method, and confirm the appointment while the slot is held.
 
-![MediQueue doctor profile and booking slots](docs/screenshots/doctor-booking.png)
+![MediQueue appointment booking confirmation](docs/screenshots/03-appointment-booking.png)
+
+### Live queue tracker
+
+Patients can follow their queue position, estimated start time, and visit progress on the appointment day.
+
+![MediQueue patient live queue tracker](docs/screenshots/04-live-queue-tracker.png)
+
+### Contact staff
+
+Patients with an active appointment can message the staff member handling their doctor's queue.
+
+![MediQueue patient and staff messaging](docs/screenshots/05-contact-staff.png)
 
 ### Staff live board
 
 Reception staff can manage the day's appointments through an original schedule, a live timeline, waiting-room summaries, and queue status columns.
 
-![MediQueue staff live board](docs/screenshots/staff-live-board.png)
+![MediQueue staff live board](docs/screenshots/06-staff-live-board.png)
+
+### Admin department management
+
+Administrators can create, edit, activate, and deactivate hospital departments.
+
+![MediQueue admin department management](docs/screenshots/07-admin-departments.png)
 
 ## Features
 
@@ -173,6 +191,10 @@ npm run preview
 
 - Local credentials remain in `backend/.env` and are not tracked.
 - The included payment interface is a demonstration flow, not a production payment integration.
+
+## Acknowledgments
+
+The initial patient appointment landing-page design was inspired by [this YouTube tutorial](https://youtu.be/eRTTlS0zaW8). The MediQueue implementation was written independently.
 
 ## License
 
