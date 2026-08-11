@@ -2,7 +2,7 @@
 
 MediQueue is a full-stack hospital appointment and live queue management system. It gives patients, reception staff, doctors, and administrators role-specific workflows while keeping queue changes synchronized in real time.
 
-## Screenshots
+## Small Preview
 
 ### Patient home
 
