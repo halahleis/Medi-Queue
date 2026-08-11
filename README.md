@@ -172,10 +172,7 @@ npm run preview
 ## Security and data notes
 
 - Local credentials remain in `backend/.env` and are not tracked.
-- Runtime patient uploads under `backend/uploads/` are ignored and must not be committed.
-- Demo credentials are for local development only.
 - The included payment interface is a demonstration flow, not a production payment integration.
-- Do not use real patient or medical data in the demo database.
 
 ## License
 
