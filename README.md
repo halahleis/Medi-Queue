@@ -50,10 +50,10 @@ Reception staff can manage the day's appointments through an original schedule, 
 .
 |-- backend/
 |   |-- scripts/          # base schema, migrations, and seed utilities
-|   `-- src/              # API, services, middleware, and sockets
+|   |-- src/              # API, services, middleware, and sockets
 |-- docs/screenshots/     # README screenshots
-`-- frontend/
-    `-- src/              # React pages, components, API helpers, and styles
+|-- frontend/
+    |-- src/              # React pages, components, API helpers, and styles
 ```
 
 ## Local setup
