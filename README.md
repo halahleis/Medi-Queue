@@ -41,7 +41,7 @@ Reception staff can manage the day's appointments through an original schedule, 
 ## Tech stack
 
 - Frontend: React, React Router, Vite, Axios, Socket.IO Client
-- Backend: Node.js, Express, PostgreSQL, `pg`, JWT, bcrypt, Nodemailer, Socket.IO
+- Backend: Node.js, Express, PostgreSQL, JWT, bcrypt, Nodemailer, Socket.IO
 - Database tooling: PostgreSQL or pgAdmin
 
 ## Project structure
