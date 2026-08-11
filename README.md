@@ -1,6 +1,6 @@
 # MediQueue
 
-MediQueue is a full-stack hospital appointment and live queue management system. It gives patients, reception staff, doctors, and administrators role-specific workflows while keeping queue changes synchronized in real time.
+Full-stack hospital appointment booking and live queue management platform. Patients book appointments online, doctors manage consultations and prescriptions, staff coordinate daily operations through a Kanban board and live timeline, and administrators manage doctors, departments, staff, and accounts.
 
 ## Small Preview
 
