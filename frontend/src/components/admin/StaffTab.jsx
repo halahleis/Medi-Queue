@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from 'react';
 import toast from 'react-hot-toast';
 import api from '../../api/client';
 import Modal from '../Modal.jsx';
+import PasswordInput from '../PasswordInput.jsx';
 import { PasswordResetModal } from './DoctorsTab.jsx';
 
 export default function StaffTab() {
@@ -195,7 +196,11 @@ function StaffModal({ target, onClose, onSaved }) {
             </div>
             <div>
               <label className="label">Initial password</label>
-              <input className="input" type="password" value={form.password || ''} onChange={(e) => upd('password', e.target.value)} />
+              <PasswordInput
+                value={form.password || ''}
+                onChange={(e) => upd('password', e.target.value)}
+                autoComplete="new-password"
+              />
             </div>
           </>
         ) : (

@@ -25,12 +25,13 @@ export default function ConsultationModal({ entry, onClose, onCompleted }) {
   const [rxForm, setRxForm] = useState({ medicationName: '', dosage: '', instructions: '', validUntil: '' });
   const [rxBusy, setRxBusy] = useState(false);
 
-  const load = async () => {
-    setLoading(true);
+  const load = async ({ syncForm = true, showSpinner = true } = {}) => {
+    if (showSpinner) setLoading(true);
     try {
       const { data } = await api.get(`/doctor/appointments/${entry.appointment_id}/patient`);
       setData(data);
       const c = data.consultation;
+      if (!syncForm) return;
       if (c) {
         setForm({
           symptoms: c.symptoms || '',
@@ -38,7 +39,7 @@ export default function ConsultationModal({ entry, onClose, onCompleted }) {
           treatmentPlan: c.treatment_plan || '',
           recommendations: c.recommendations || '',
           followupRecommended: !!c.followup_recommended,
-          followupByDate: c.followup_by_date || '',
+          followupByDate: toDateInputValue(c.followup_by_date),
         });
       } else {
         setForm({
@@ -49,7 +50,7 @@ export default function ConsultationModal({ entry, onClose, onCompleted }) {
     } catch (err) {
       toast.error(err.displayMessage || 'Could not load patient info.');
     } finally {
-      setLoading(false);
+      if (showSpinner) setLoading(false);
     }
   };
 
@@ -59,7 +60,7 @@ export default function ConsultationModal({ entry, onClose, onCompleted }) {
 
   const upd = (k, v) => setForm((f) => ({ ...f, [k]: v }));
 
-  const saveNotes = async () => {
+  const saveNotes = async ({ reloadAfter = true, successToast = true } = {}) => {
     if (form.followupRecommended && !form.followupByDate) {
       toast.error('Please specify a follow-up date.');
       return;
@@ -70,9 +71,11 @@ export default function ConsultationModal({ entry, onClose, onCompleted }) {
         `/doctor/appointments/${entry.appointment_id}/consultation`,
         form
       );
-      toast.success('Consultation saved.');
-      // Reload to pull the prescription list (consultation_id may have just been created).
-      await load();
+      if (successToast) toast.success('Consultation saved.');
+      if (reloadAfter) {
+        // Reload to pull server-normalized consultation fields.
+        await load();
+      }
       return out.consultationId;
     } catch (err) {
       toast.error(err.displayMessage || 'Save failed.');
@@ -86,18 +89,16 @@ export default function ConsultationModal({ entry, onClose, onCompleted }) {
       toast.error('Medication name and dosage are required.');
       return;
     }
-    // Make sure a consultation record exists first.
-    let consId = data?.consultation?.id;
-    if (!consId) {
-      consId = await saveNotes();
-      if (!consId) return;
-    }
+    // Persist the note draft first so refreshing prescriptions cannot replace it
+    // with an older server snapshot.
+    const consId = await saveNotes({ reloadAfter: false, successToast: false });
+    if (!consId) return;
     setRxBusy(true);
     try {
       await api.post(`/doctor/consultations/${consId}/prescriptions`, rxForm);
       setRxForm({ medicationName: '', dosage: '', instructions: '', validUntil: '' });
       toast.success('Prescription added.');
-      await load();
+      await load({ syncForm: false, showSpinner: false });
     } catch (err) {
       toast.error(err.displayMessage || 'Could not add prescription.');
     } finally {
@@ -108,7 +109,7 @@ export default function ConsultationModal({ entry, onClose, onCompleted }) {
   const removePrescription = async (id) => {
     try {
       await api.delete(`/doctor/prescriptions/${id}`);
-      await load();
+      await load({ syncForm: false, showSpinner: false });
     } catch (err) {
       toast.error(err.displayMessage || 'Could not remove prescription.');
     }
@@ -309,4 +310,12 @@ function Field({ label, k, form, upd, disabled }) {
       />
     </div>
   );
+}
+
+function toDateInputValue(value) {
+  if (!value) return '';
+  const raw = String(value);
+  if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) return raw;
+  if (/^\d{4}-\d{2}-\d{2}T/.test(raw)) return raw.slice(0, 10);
+  return '';
 }

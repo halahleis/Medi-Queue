@@ -1,5 +1,5 @@
-// Pixels per minute on the timeline. 60 px/hour.
-export const PX_PER_MIN = 1;
+// Pixels per minute on the timeline. 75 px/hour.
+export const PX_PER_MIN = 1.25;
 
 // Minutes past scheduled time before a patient is considered "late".
 // Must match the backend's LATE_GRACE_MIN in queueService.js.
@@ -78,9 +78,8 @@ export const computeVisibleEnd = (entry, nowMin, visibleStart) => {
     return timeToMin(entry.actual_end_time || entry.scheduled_end_time);
   }
   if (entry.kanban_status === 'in_consultation') {
-    const sched = timeToMin(entry.scheduled_end_time);
     // Always at least 5 min tall so a freshly admitted card is visible at NOW.
-    return Math.max(visibleStart + 5, nowMin, sched);
+    return Math.max(visibleStart + 5, nowMin);
   }
   const sched = timeToMin(entry.scheduled_end_time);
   const duration = sched - timeToMin(entry.scheduled_start_time);

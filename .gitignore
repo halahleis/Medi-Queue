@@ -1,5 +1,8 @@
 node_modules/
 .env
+.env.*
+!.env.example
 dist/
 build/
+backend/uploads/
 .DS_Store

@@ -28,6 +28,7 @@ router.post('/entries/:entryId/action-required',    c.sendActionRequired);
 
 // Global delay for a doctor's day
 router.post('/board/:doctorId/global-delay', c.globalDelay);
+router.post('/board/:doctorId/cancel-remaining', c.cancelRemainingDay);
 
 // Search
 router.get('/search', c.search);
@@ -35,6 +36,12 @@ router.get('/search', c.search);
 // Doctor–staff chat
 router.get('/chat/:doctorId',  c.listChat);
 router.post('/chat/:doctorId', c.sendChat);
+
+// Patient-staff communication
+router.get('/patient-conversations', c.listPatientConversations);
+router.get('/patient-conversations/:conversationId', c.getPatientConversation);
+router.post('/patient-conversations/:conversationId/messages', c.sendPatientConversationMessage);
+router.patch('/patient-conversations/:conversationId/status', c.updatePatientConversationStatus);
 
 // End-of-day summary
 router.get('/end-of-day', c.endOfDay);

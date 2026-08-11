@@ -139,6 +139,57 @@ a:hover { text-decoration: underline; }
   margin-bottom: 6px;
 }
 
+.field-error {
+  margin-top: 6px;
+  color: var(--danger);
+  font-size: 12px;
+}
+
+.password-rules {
+  display: grid;
+  gap: 4px;
+  margin-top: 8px;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.password-rules div {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.password-rules span {
+  width: 22px;
+  color: var(--danger);
+  font-weight: 700;
+  font-size: 11px;
+}
+
+.password-rules .met {
+  color: var(--success);
+}
+
+.password-rules .met span {
+  color: var(--success);
+}
+
+.phone-input-row {
+  display: grid;
+  grid-template-columns: minmax(160px, 0.55fr) minmax(160px, 1fr);
+  gap: 8px;
+}
+
+.phone-country-select {
+  min-width: 0;
+}
+
+@media (max-width: 620px) {
+  .phone-input-row {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* ------------------------------ Cards ------------------------------ */
 .card {
   background: var(--surface);
@@ -291,7 +342,10 @@ a:hover { text-decoration: underline; }
   box-shadow: var(--shadow-lg);
   width: 100%;
   max-width: 460px;
+  max-height: calc(100vh - 40px);
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
   animation: modalIn 0.18s ease-out;
 }
 .modal-header {
@@ -299,13 +353,17 @@ a:hover { text-decoration: underline; }
   font-size: 17px;
   font-weight: 600;
 }
-.modal-body { padding: 18px 24px; }
+.modal-body {
+  padding: 18px 24px;
+  overflow: auto;
+}
 .modal-footer {
   padding: 14px 24px;
   background: var(--border-soft);
   display: flex;
   justify-content: flex-end;
   gap: 10px;
+  flex-shrink: 0;
 }
 @keyframes modalIn {
   from { opacity: 0; transform: translateY(8px); }

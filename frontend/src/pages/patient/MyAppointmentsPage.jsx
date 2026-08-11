@@ -1,11 +1,12 @@
 import { useEffect, useState, useCallback } from 'react';
 import toast from 'react-hot-toast';
 import api from '../../api/client';
-import LiveTrackerBanner from '../../components/patient/LiveTrackerBanner.jsx';
+import PaymentModal from '../../components/patient/PaymentModal.jsx';
 
 export default function MyAppointmentsPage() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [paymentAppointment, setPaymentAppointment] = useState(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -33,20 +34,10 @@ export default function MyAppointmentsPage() {
     }
   };
 
-  const handlePay = async (appt) => {
-    try {
-      await api.post(`/patient/appointments/${appt.id}/pay`);
-      toast.success('Payment received.');
-      load();
-    } catch (err) {
-      toast.error(err.displayMessage || 'Payment failed.');
-    }
-  };
+  const handlePay = (appt) => setPaymentAppointment(appt);
 
   return (
     <div className="patient-page">
-      <LiveTrackerBanner onChange={load} />
-
       <h2 style={{ fontSize: 20, fontWeight: 600, marginBottom: 18 }}>My Appointments</h2>
 
       {loading && <div className="empty">Loading…</div>}
@@ -64,16 +55,26 @@ export default function MyAppointmentsPage() {
           />
         ))}
       </div>
+
+      {paymentAppointment && (
+        <PaymentModal
+          appointment={paymentAppointment}
+          amount={paymentAppointment.fee_charged}
+          onClose={() => setPaymentAppointment(null)}
+          onPaid={() => {
+            toast.success('Payment received.');
+            setPaymentAppointment(null);
+            load();
+          }}
+        />
+      )}
     </div>
   );
 }
 
 function ApptCard({ appt, onCancel, onPay }) {
-  const date = new Date(appt.slot_date + 'T00:00:00');
-  const dateStr = date.toLocaleDateString(undefined, {
-    day: 'numeric', month: 'short', year: 'numeric',
-  });
-  const time = appt.start_time.slice(0, 5);
+  const dateStr = formatAppointmentDate(appt.slot_date || appt.scheduled_at);
+  const time = (appt.start_time || '').slice(0, 5) || formatAppointmentTime(appt.scheduled_at);
 
   // 24h cancellation rule (frontend hint — server enforces too).
   const hoursAhead = (new Date(appt.scheduled_at) - new Date()) / (1000 * 60 * 60);
@@ -135,6 +136,24 @@ function ApptCard({ appt, onCancel, onPay }) {
       </div>
     </div>
   );
+}
+
+function formatAppointmentDate(value) {
+  if (!value) return 'Date unavailable';
+  const raw = String(value);
+  const datePart = raw.includes('T') ? raw.slice(0, 10) : raw.slice(0, 10);
+  const date = new Date(`${datePart}T00:00:00`);
+  if (Number.isNaN(date.getTime())) return 'Date unavailable';
+  return date.toLocaleDateString(undefined, {
+    day: 'numeric', month: 'short', year: 'numeric',
+  });
+}
+
+function formatAppointmentTime(value) {
+  if (!value) return '';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+  return date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
 }
 
 function StatusBadge({ status }) {

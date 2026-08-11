@@ -10,6 +10,7 @@ import ReferenceSidebar from '../components/ReferenceSidebar.jsx';
 import LiveTimeline from '../components/LiveTimeline.jsx';
 import KanbanBoard from '../components/KanbanBoard.jsx';
 import ChatPanel from '../components/ChatPanel.jsx';
+import PatientStaffInbox from '../components/PatientStaffInbox.jsx';
 import SearchPanel from '../components/SearchPanel.jsx';
 import EndOfDayPanel from '../components/EndOfDayPanel.jsx';
 import Modal from '../components/Modal.jsx';
@@ -29,8 +30,10 @@ export default function StaffWorkspace() {
 
   // ------- modals -------
   const [searchOpen, setSearchOpen] = useState(false);
+  const [patientInboxOpen, setPatientInboxOpen] = useState(false);
   const [eodOpen, setEodOpen] = useState(false);
   const [delayOpen, setDelayOpen] = useState(false);
+  const [cancelDayOpen, setCancelDayOpen] = useState(false);
 
   const isToday = date === todayStr();
 
@@ -136,6 +139,21 @@ export default function StaffWorkspace() {
     }
   };
 
+  const handleCancelRemaining = async (message) => {
+    if (!doctorId) return;
+    try {
+      const { data } = await api.post(`/staff/board/${doctorId}/cancel-remaining`, {
+        date,
+        message,
+      });
+      toast.success(`Cancelled ${data.affectedCount || 0} remaining appointment(s).`);
+      setCancelDayOpen(false);
+      await fetchAll();
+    } catch (err) {
+      toast.error(err.displayMessage || 'Could not cancel remaining appointments.');
+    }
+  };
+
   const currentDoctor = doctors.find((d) => d.id === doctorId);
 
   return (
@@ -179,8 +197,14 @@ export default function StaffWorkspace() {
           <button className="btn btn-outline btn-sm" onClick={() => setSearchOpen(true)}>
             🔍 Search
           </button>
+          <button className="btn btn-outline btn-sm" onClick={() => setPatientInboxOpen(true)}>
+            Patient messages
+          </button>
           <button className="btn btn-outline btn-sm" onClick={() => setDelayOpen(true)}>
             ⏱ Apply delay
+          </button>
+          <button className="btn btn-outline btn-sm" onClick={() => setCancelDayOpen(true)}>
+            Cancel remaining
           </button>
           <button className="btn btn-outline btn-sm" onClick={() => setEodOpen(true)}>
             📊 End-of-day
@@ -257,11 +281,17 @@ export default function StaffWorkspace() {
 
       {/* Modals */}
       <SearchPanel open={searchOpen} onClose={() => setSearchOpen(false)} />
+      <PatientStaffInbox open={patientInboxOpen} onClose={() => setPatientInboxOpen(false)} />
       <EndOfDayPanel open={eodOpen} onClose={() => setEodOpen(false)} date={date} />
       <DelayModal
         open={delayOpen}
         onClose={() => setDelayOpen(false)}
         onApply={handleGlobalDelay}
+      />
+      <CancelRemainingModal
+        open={cancelDayOpen}
+        onClose={() => setCancelDayOpen(false)}
+        onApply={handleCancelRemaining}
       />
     </div>
   );
@@ -386,6 +416,46 @@ function DelayModal({ open, onClose, onApply }) {
           All upcoming and waiting (not-yet-admitted) entries for this doctor on this date will
           shift forward by this many minutes. In-consultation and completed entries are not
           affected.
+        </div>
+      </div>
+    </Modal>
+  );
+}
+
+function CancelRemainingModal({ open, onClose, onApply }) {
+  const defaultMessage = 'The doctor has an emergency and cannot continue today. Please book another day.';
+  const [message, setMessage] = useState(defaultMessage);
+
+  useEffect(() => {
+    if (open) setMessage(defaultMessage);
+  }, [open]);
+
+  return (
+    <Modal
+      open={open}
+      onClose={onClose}
+      title="Cancel remaining appointments"
+      footer={
+        <>
+          <button className="btn btn-ghost" onClick={onClose}>Cancel</button>
+          <button className="btn btn-danger" onClick={() => onApply(message)}>
+            Cancel remaining day
+          </button>
+        </>
+      }
+    >
+      <div className="col">
+        <div>
+          <label className="label">Message to live-queue patients</label>
+          <textarea
+            className="input"
+            rows={4}
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+          />
+        </div>
+        <div className="muted" style={{ fontSize: 12 }}>
+          Remaining appointments for this doctor today will be cancelled. The message and email are sent only to active live-queue patients whose visit is not done.
         </div>
       </div>
     </Modal>

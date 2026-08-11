@@ -3,6 +3,10 @@ import { useNavigate, Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import api from '../api/client';
 import { useAuth } from '../context/AuthContext';
+import PasswordRules from '../components/PasswordRules.jsx';
+import PasswordInput from '../components/PasswordInput.jsx';
+import PhoneInput from '../components/PhoneInput.jsx';
+import { findCountry, parseInternationalPhone, passwordMessage, validateNationalPhone } from '../utils/formValidation';
 
 const BLOOD_TYPES = ['', 'A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
 
@@ -25,6 +29,23 @@ export default function RegisterPage() {
     e.preventDefault();
     if (form.password !== form.confirmPassword) {
       toast.error('Passwords do not match.');
+      return;
+    }
+    const passwordError = passwordMessage(form.password);
+    if (passwordError) {
+      toast.error(passwordError);
+      return;
+    }
+    const phoneParsed = parseInternationalPhone(form.phone);
+    const phoneError = validateNationalPhone(findCountry(phoneParsed.countryCode), phoneParsed.nationalNumber);
+    if (phoneError) {
+      toast.error(phoneError);
+      return;
+    }
+    const emergencyParsed = parseInternationalPhone(form.emergencyContactPhone);
+    const emergencyPhoneError = validateNationalPhone(findCountry(emergencyParsed.countryCode), emergencyParsed.nationalNumber);
+    if (emergencyPhoneError) {
+      toast.error(`Emergency contact: ${emergencyPhoneError}`);
       return;
     }
     setBusy(true);
@@ -67,30 +88,29 @@ export default function RegisterPage() {
         </div>
 
         <div className="field">
-          <label className="label">Phone</label>
-          <input className="input" value={form.phone} onChange={(e) => upd('phone', e.target.value)} />
+          <PhoneInput value={form.phone} onChange={(value) => upd('phone', value)} />
         </div>
 
         <div className="field">
           <label className="label">Password *</label>
-          <input
-            className="input"
-            type="password"
+          <PasswordInput
             value={form.password}
             onChange={(e) => upd('password', e.target.value)}
             required
-            minLength={6}
+            minLength={8}
+            autoComplete="new-password"
           />
+          <PasswordRules password={form.password} />
         </div>
 
         <div className="field">
           <label className="label">Confirm password *</label>
-          <input
-            className="input"
-            type="password"
+          <PasswordInput
             value={form.confirmPassword}
             onChange={(e) => upd('confirmPassword', e.target.value)}
             required
+            minLength={8}
+            autoComplete="new-password"
           />
         </div>
 
@@ -136,8 +156,11 @@ export default function RegisterPage() {
               <input className="input" value={form.emergencyContactName} onChange={(e) => upd('emergencyContactName', e.target.value)} />
             </div>
             <div className="field">
-              <label className="label">Emergency contact phone</label>
-              <input className="input" value={form.emergencyContactPhone} onChange={(e) => upd('emergencyContactPhone', e.target.value)} />
+              <PhoneInput
+                label="Emergency contact phone"
+                value={form.emergencyContactPhone}
+                onChange={(value) => upd('emergencyContactPhone', value)}
+              />
             </div>
             <div className="muted" style={{ fontSize: 12 }}>
               Medical info is optional during signup — you can fill it in later from your profile.

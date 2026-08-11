@@ -106,6 +106,7 @@ const getBoard = async (doctorId, dateStr) => {
         a.fee_charged,
         p.id                AS patient_id,
         p.full_name         AS patient_name,
+        p.user_id           AS patient_user_id,
         u.email             AS patient_email,
         u.phone             AS patient_phone,
         -- Original booked slot time. Immutable — survives delay shifts.

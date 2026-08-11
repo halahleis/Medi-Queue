@@ -2,6 +2,8 @@ require('dotenv').config();
 
 const express = require('express');
 const http = require('http');
+const fs = require('fs');
+const path = require('path');
 const cors = require('cors');
 const morgan = require('morgan');
 
@@ -47,6 +49,10 @@ initSocket(server);
 
 // Verify DB connection before starting.
 pool.query('SELECT 1')
+  .then(() => {
+    const schemaPath = path.join(__dirname, '..', 'scripts', 'patient_staff_communication_schema.sql');
+    return pool.query(fs.readFileSync(schemaPath, 'utf8'));
+  })
   .then(() => {
     server.listen(PORT, () => {
       console.log(`✅ MediQueue API listening on http://localhost:${PORT}`);

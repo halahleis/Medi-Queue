@@ -20,8 +20,7 @@ const { query, getClient } = require('../config/db');
 const { asyncHandler } = require('../middleware/errorHandler');
 const { logAction } = require('../utils/audit');
 const { todayDateStr } = require('../utils/time');
-
-const PASSWORD_MIN = 6;
+const { validatePassword } = require('../utils/validation');
 
 /* -------------------------------------------------------------------------- */
 /*  Dashboard overview                                                         */
@@ -154,9 +153,8 @@ const createDoctor = asyncHandler(async (req, res) => {
   if (!email || !password || !fullName || !specialty) {
     return res.status(400).json({ message: 'Email, password, full name, and specialty are required.' });
   }
-  if (password.length < PASSWORD_MIN) {
-    return res.status(400).json({ message: `Password must be at least ${PASSWORD_MIN} characters.` });
-  }
+  const passwordError = validatePassword(password);
+  if (passwordError) return res.status(400).json({ message: passwordError });
 
   const dup = await query('SELECT id FROM users WHERE email = $1', [email.toLowerCase().trim()]);
   if (dup.rowCount > 0) {
@@ -298,9 +296,8 @@ const setDoctorActive = asyncHandler(async (req, res) => {
 const resetDoctorPassword = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { newPassword } = req.body || {};
-  if (!newPassword || newPassword.length < PASSWORD_MIN) {
-    return res.status(400).json({ message: `New password must be at least ${PASSWORD_MIN} characters.` });
-  }
+  const passwordError = validatePassword(newPassword || '');
+  if (passwordError) return res.status(400).json({ message: passwordError });
   const docRes = await query('SELECT user_id FROM doctors WHERE id = $1', [id]);
   if (docRes.rowCount === 0) return res.status(404).json({ message: 'Doctor not found.' });
   const hash = await bcrypt.hash(newPassword, 10);
@@ -331,9 +328,8 @@ const createStaff = asyncHandler(async (req, res) => {
   if (!email || !password || !fullName) {
     return res.status(400).json({ message: 'Email, password, and full name are required.' });
   }
-  if (password.length < PASSWORD_MIN) {
-    return res.status(400).json({ message: `Password must be at least ${PASSWORD_MIN} characters.` });
-  }
+  const passwordError = validatePassword(password);
+  if (passwordError) return res.status(400).json({ message: passwordError });
 
   const dup = await query('SELECT id FROM users WHERE email = $1', [email.toLowerCase().trim()]);
   if (dup.rowCount > 0) {
@@ -433,9 +429,8 @@ const setStaffActive = asyncHandler(async (req, res) => {
 const resetStaffPassword = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { newPassword } = req.body || {};
-  if (!newPassword || newPassword.length < PASSWORD_MIN) {
-    return res.status(400).json({ message: `New password must be at least ${PASSWORD_MIN} characters.` });
-  }
+  const passwordError = validatePassword(newPassword || '');
+  if (passwordError) return res.status(400).json({ message: passwordError });
   const sRes = await query('SELECT user_id FROM staff WHERE id = $1', [id]);
   if (sRes.rowCount === 0) return res.status(404).json({ message: 'Staff member not found.' });
   const hash = await bcrypt.hash(newPassword, 10);

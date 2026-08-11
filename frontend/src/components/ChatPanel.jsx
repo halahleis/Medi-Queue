@@ -5,10 +5,10 @@ import { getSocket } from '../api/socket';
 import { useAuth } from '../context/AuthContext';
 
 const QUICK_ACTIONS = [
-  { key: 'running_late',   label: 'Running Late',   message: 'Doctor is running late.' },
-  { key: 'ready_for_next', label: 'Ready for Next', message: 'Doctor is ready for next patient.' },
-  { key: 'pause_queue',    label: 'Pause Queue',    message: 'Please pause the queue.' },
-  { key: 'resume_queue',   label: 'Resume Queue',   message: 'Queue can resume.' },
+  { key: 'acknowledged', label: 'Well Received', message: 'Well received. I will update the queue accordingly.' },
+  { key: 'delay_check', label: 'Delay Check', message: 'Are you running late? If yes, how many minutes should I delay the remaining queue?' },
+  { key: 'ready_for_next', label: 'Ready for Next', message: 'Are you ready for the next patient?' },
+  { key: 'emergency_check', label: 'Emergency', message: 'Do you need us to pause or cancel the remaining appointments for today?' },
 ];
 
 export default function ChatPanel({ doctorId, doctorName, date }) {

@@ -2,6 +2,8 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 import LoginPage from './pages/LoginPage.jsx';
 import RegisterPage from './pages/RegisterPage.jsx';
+import ForgotPasswordPage from './pages/ForgotPasswordPage.jsx';
+import ResetPasswordPage from './pages/ResetPasswordPage.jsx';
 import StaffWorkspace from './pages/StaffWorkspace.jsx';
 import AdminWorkspace from './pages/AdminWorkspace.jsx';
 import DoctorWorkspace from './pages/DoctorWorkspace.jsx';
@@ -13,6 +15,7 @@ import MyAppointmentsPage from './pages/patient/MyAppointmentsPage.jsx';
 import ProfilePage from './pages/patient/ProfilePage.jsx';
 import AboutPage from './pages/patient/AboutPage.jsx';
 import ContactPage from './pages/patient/ContactPage.jsx';
+import LiveQueueTrackerPage from './pages/patient/LiveQueueTrackerPage.jsx';
 
 const RequireRole = ({ role, children }) => {
   const { user, token } = useAuth();
@@ -37,6 +40,8 @@ export default function App() {
       {/* Public auth pages */}
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
+      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+      <Route path="/reset-password" element={<ResetPasswordPage />} />
 
       {/* Patient pages — public browsing allowed for Home/Doctors/About/Contact;
           booking + profile + appointments require login (handled inside the page) */}
@@ -45,7 +50,14 @@ export default function App() {
         <Route path="/doctors"        element={<AllDoctorsPage />} />
         <Route path="/doctors/:id"    element={<DoctorDetailPage />} />
         <Route path="/about"          element={<AboutPage />} />
-        <Route path="/contact"        element={<ContactPage />} />
+        <Route
+          path="/contact"
+          element={<RequireRole role="patient"><ContactPage /></RequireRole>}
+        />
+        <Route
+          path="/live-queue-tracker"
+          element={<RequireRole role="patient"><LiveQueueTrackerPage /></RequireRole>}
+        />
         <Route
           path="/my-appointments"
           element={<RequireRole role="patient"><MyAppointmentsPage /></RequireRole>}

@@ -60,6 +60,48 @@ const assertWithinBookingWindow = (dateStr) => {
   }
 };
 
+const assertPatientCanBookSlot = async (
+  patientId,
+  doctorId,
+  dateStr,
+  startTime,
+  endTime,
+  clientOrPool = null
+) => {
+  const c = clientOrPool || { query };
+
+  const sameDoctor = await c.query(
+    `SELECT a.id
+       FROM appointments a
+       JOIN appointment_slots s ON s.id = a.slot_id
+      WHERE a.patient_id = $1
+        AND a.doctor_id = $2
+        AND s.slot_date = $3::date
+        AND a.status <> 'cancelled'
+      LIMIT 1`,
+    [patientId, doctorId, dateStr]
+  );
+  if (sameDoctor.rowCount > 0) {
+    throw httpError(409, 'You already have an appointment with this doctor on this day. Choose another day or cancel the existing appointment first.');
+  }
+
+  const overlap = await c.query(
+    `SELECT a.id
+       FROM appointments a
+       JOIN appointment_slots s ON s.id = a.slot_id
+      WHERE a.patient_id = $1
+        AND s.slot_date = $2::date
+        AND a.status <> 'cancelled'
+        AND $3::time < s.end_time
+        AND $4::time > s.start_time
+      LIMIT 1`,
+    [patientId, dateStr, startTime, endTime]
+  );
+  if (overlap.rowCount > 0) {
+    throw httpError(409, 'This appointment overlaps another appointment you already booked that day. Choose a different time.');
+  }
+};
+
 /**
  * Compute the bookable slots for a given doctor on a given date.
  * Returns an array of { start_time, end_time, status } where status is:
@@ -168,66 +210,61 @@ const holdSlot = async (doctorId, dateStr, startTime, endTime, patientId) => {
   assertWithinBookingWindow(dateStr);
   await releaseExpiredHolds();
 
-  const client = await getClient();
-  try {
-    await client.query('BEGIN');
+  await assertPatientCanBookSlot(patientId, doctorId, dateStr, startTime, endTime);
 
-    // The unique constraint is (doctor_id, slot_date, start_time). Match on
-    // exactly those columns when looking for an existing row — matching also
-    // on end_time would let an INSERT race past a real conflict and crash on
-    // the unique constraint.
-    const conflictRes = await client.query(
-      `SELECT id, status, reserved_by_patient_id, reservation_expires_at
+  // Use INSERT ... ON CONFLICT DO UPDATE so this is atomic against the
+  // (doctor_id, slot_date, start_time) unique constraint. A SELECT-then-
+  // INSERT-or-UPDATE pattern races under concurrent calls (FOR UPDATE
+  // can't lock a row that doesn't exist yet, so two simultaneous holds
+  // both see an empty SELECT and both try to INSERT, with the second
+  // crashing on the unique key).
+  //
+  // The conflict clause refuses to overwrite a real booking, and refuses
+  // to steal a fresh hold from another patient. Otherwise it resets the
+  // row to a brand-new reservation for this patient.
+  const result = await query(
+    `INSERT INTO appointment_slots
+       (doctor_id, slot_date, start_time, end_time, status,
+        reserved_by_patient_id, reservation_expires_at)
+     VALUES ($1, $2, $3, $4, 'reserved', $5,
+             NOW() + ($6 || ' minutes')::interval)
+     ON CONFLICT (doctor_id, slot_date, start_time) DO UPDATE
+       SET end_time               = EXCLUDED.end_time,
+           status                 = 'reserved',
+           reserved_by_patient_id = EXCLUDED.reserved_by_patient_id,
+           reservation_expires_at = EXCLUDED.reservation_expires_at
+       WHERE appointment_slots.status = 'available'
+          OR (appointment_slots.status = 'reserved' AND (
+                 appointment_slots.reserved_by_patient_id = EXCLUDED.reserved_by_patient_id
+              OR appointment_slots.reservation_expires_at < NOW()
+             ))
+     RETURNING id`,
+    [doctorId, dateStr, startTime, endTime, patientId, HOLD_MINUTES]
+  );
+
+  if (result.rowCount === 0) {
+    // The conflict-target row exists but the WHERE on DO UPDATE rejected
+    // the overwrite — so it's either booked, or a fresh reservation by
+    // someone else. Surface the right message to the caller.
+    const probe = await query(
+      `SELECT status, reserved_by_patient_id, reservation_expires_at
          FROM appointment_slots
-        WHERE doctor_id = $1 AND slot_date = $2 AND start_time = $3
-        FOR UPDATE`,
+        WHERE doctor_id = $1 AND slot_date = $2 AND start_time = $3`,
       [doctorId, dateStr, startTime]
     );
-
-    if (conflictRes.rowCount > 0) {
-      const row = conflictRes.rows[0];
-      if (row.status === 'booked') {
-        throw httpError(409, 'This slot has already been booked.');
-      }
-      if (row.status === 'reserved' &&
-          row.reserved_by_patient_id !== patientId &&
-          row.reservation_expires_at &&
-          new Date(row.reservation_expires_at) > new Date()) {
-        throw httpError(409, 'This slot is currently held by another patient. Try again in a moment.');
-      }
-
-      // The row is either available, expired, or held by THIS patient — in
-      // all cases we can reset it back to a fresh reservation rather than
-      // creating a duplicate.
-      await client.query(
-        `UPDATE appointment_slots
-            SET status = 'reserved',
-                end_time = $1,
-                reserved_by_patient_id = $2,
-                reservation_expires_at = NOW() + ($3 || ' minutes')::interval
-          WHERE id = $4`,
-        [endTime, patientId, HOLD_MINUTES, row.id]
-      );
-      await client.query('COMMIT');
-      return { slotId: row.id, holdMinutes: HOLD_MINUTES };
+    if (probe.rowCount === 0) {
+      // Extremely unlikely race — the conflicting row was deleted between
+      // the INSERT failing the WHERE and our follow-up SELECT.
+      throw httpError(409, 'Slot just became unavailable. Please try again.');
     }
-
-    // No row exists yet — insert.
-    const insRes = await client.query(
-      `INSERT INTO appointment_slots
-         (doctor_id, slot_date, start_time, end_time, status, reserved_by_patient_id, reservation_expires_at)
-       VALUES ($1, $2, $3, $4, 'reserved', $5, NOW() + ($6 || ' minutes')::interval)
-       RETURNING id`,
-      [doctorId, dateStr, startTime, endTime, patientId, HOLD_MINUTES]
-    );
-    await client.query('COMMIT');
-    return { slotId: insRes.rows[0].id, holdMinutes: HOLD_MINUTES };
-  } catch (err) {
-    await client.query('ROLLBACK');
-    throw err;
-  } finally {
-    client.release();
+    const row = probe.rows[0];
+    if (row.status === 'booked') {
+      throw httpError(409, 'This slot has already been booked.');
+    }
+    throw httpError(409, 'This slot is currently held by another patient. Try again in a moment.');
   }
+
+  return { slotId: result.rows[0].id, holdMinutes: HOLD_MINUTES };
 };
 
 /**
@@ -247,6 +284,7 @@ module.exports = {
   BOOKING_WINDOW_MONTHS,
   releaseExpiredHolds,
   assertWithinBookingWindow,
+  assertPatientCanBookSlot,
   getSlotsForDay,
   holdSlot,
   releaseHold,

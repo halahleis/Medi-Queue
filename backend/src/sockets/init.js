@@ -31,6 +31,11 @@ const initSocket = (httpServer) => {
     // tracker receives `patient:status` events without an extra round trip.
     if (socket.user?.role === 'patient' && socket.user?.profileId) {
       socket.join(`patient:${socket.user.profileId}`);
+      socket.join(`patient:communication:${socket.user.profileId}`);
+    }
+
+    if (socket.user?.role === 'staff') {
+      socket.join('staff:communication');
     }
 
     // Subscribe to a board's events: board:<doctorId>:<date>
@@ -47,6 +52,13 @@ const initSocket = (httpServer) => {
     });
     socket.on('chat:unsubscribe', ({ doctorId }) => {
       if (doctorId) socket.leave(`doctor:${doctorId}`);
+    });
+
+    socket.on('patient_staff:subscribe', ({ conversationId }) => {
+      if (conversationId) socket.join(`patient_staff:${conversationId}`);
+    });
+    socket.on('patient_staff:unsubscribe', ({ conversationId }) => {
+      if (conversationId) socket.leave(`patient_staff:${conversationId}`);
     });
   });
 

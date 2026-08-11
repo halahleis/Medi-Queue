@@ -14,6 +14,7 @@
 
 const { query } = require('../config/db');
 const { getIO } = require('../sockets/io');
+const { sendAppointmentEmail } = require('./emailService');
 
 /**
  * Emit a real-time status update to a patient's personal channel.
@@ -58,19 +59,35 @@ const writeNotification = async ({
  */
 const lookupRecipientFromEntry = async (queueEntryId) => {
   const r = await query(
-    `SELECT qe.appointment_id, p.id AS patient_id, u.id AS user_id
+    `SELECT qe.appointment_id, p.id AS patient_id, p.full_name AS patient_name,
+            u.id AS user_id, u.email,
+            d.full_name AS doctor_name,
+            s.slot_date::text AS appointment_date,
+            s.start_time AS appointment_time
        FROM queue_entries qe
        JOIN appointments  a ON a.id = qe.appointment_id
        JOIN patients      p ON p.id = a.patient_id
        JOIN users         u ON u.id = p.user_id
+       JOIN doctors       d ON d.id = a.doctor_id
+       JOIN appointment_slots s ON s.id = a.slot_id
       WHERE qe.id = $1`,
     [queueEntryId]
   );
   return r.rows[0] || null;
 };
 
+const sendEmailSafe = async ({ to, title, lines }) => {
+  try {
+    if (!to) return;
+    await sendAppointmentEmail({ to, title, lines });
+  } catch (err) {
+    console.error('[notify] failed to send email:', err.message);
+  }
+};
+
 module.exports = {
   emitStatusUpdate,
   writeNotification,
   lookupRecipientFromEntry,
+  sendEmailSafe,
 };

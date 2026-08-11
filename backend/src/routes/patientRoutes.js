@@ -36,4 +36,9 @@ router.post  ('/check-in',               c.selfCheckIn);
 // Notifications
 router.get   ('/notifications',          c.listNotifications);
 
+// Patient <-> staff communication
+router.get   ('/staff-contact-options',       c.listTodayContactOptions);
+router.get   ('/staff-conversation',          c.getStaffConversation);
+router.post  ('/staff-conversation/messages', c.sendStaffMessage);
+
 module.exports = router;

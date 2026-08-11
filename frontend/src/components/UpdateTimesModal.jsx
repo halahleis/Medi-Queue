@@ -10,8 +10,9 @@ export default function UpdateTimesModal({ entry, onClose, onSave }) {
 
   useEffect(() => {
     if (entry) {
-      setStart(fmtTime(entry.scheduled_start_time));
-      setEnd(fmtTime(entry.scheduled_end_time));
+      const admitted = entry.kanban_status === 'in_consultation';
+      setStart(fmtTime(admitted ? entry.actual_start_time : entry.scheduled_start_time));
+      setEnd(fmtTime(admitted ? currentTimeValue() : entry.scheduled_end_time));
     }
   }, [entry]);
 
@@ -71,4 +72,12 @@ export default function UpdateTimesModal({ entry, onClose, onSave }) {
       </div>
     </Modal>
   );
+}
+
+function currentTimeValue() {
+  const d = new Date();
+  return [
+    String(d.getHours()).padStart(2, '0'),
+    String(d.getMinutes()).padStart(2, '0'),
+  ].join(':');
 }

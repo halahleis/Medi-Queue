@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from 'react';
 import toast from 'react-hot-toast';
 import api from '../../api/client';
 import Modal from '../Modal.jsx';
+import PasswordInput from '../PasswordInput.jsx';
 
 export default function DoctorsTab() {
   const [items, setItems] = useState([]);
@@ -251,7 +252,11 @@ function DoctorModal({ target, departments, onClose, onSaved }) {
             </div>
             <div>
               <label className="label">Initial password</label>
-              <input className="input" type="password" value={form.password || ''} onChange={(e) => upd('password', e.target.value)} />
+              <PasswordInput
+                value={form.password || ''}
+                onChange={(e) => upd('password', e.target.value)}
+                autoComplete="new-password"
+              />
             </div>
           </>
         )}
@@ -308,7 +313,7 @@ export function PasswordResetModal({ target, kind, onClose, onSaved }) {
   if (!target) return null;
 
   const save = async () => {
-    if (!pwd || pwd.length < 6) { toast.error('Password must be at least 6 characters.'); return; }
+    if (!pwd || pwd.length < 8) { toast.error('Password must be at least 8 characters.'); return; }
     setBusy(true);
     try {
       await api.post(`/admin/${kind}/${target.id}/password`, { newPassword: pwd });
@@ -337,7 +342,12 @@ export function PasswordResetModal({ target, kind, onClose, onSaved }) {
     >
       <div>
         <label className="label">New password</label>
-        <input className="input" type="password" value={pwd} onChange={(e) => setPwd(e.target.value)} autoFocus />
+        <PasswordInput
+          value={pwd}
+          onChange={(e) => setPwd(e.target.value)}
+          autoFocus
+          autoComplete="new-password"
+        />
         <div className="muted" style={{ fontSize: 12, marginTop: 8 }}>
           The user will use this password the next time they sign in.
         </div>

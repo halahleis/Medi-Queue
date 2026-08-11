@@ -57,7 +57,12 @@ export default function PatientLayout() {
           <NavLink to="/home"    className={({isActive}) => `topbar-tab ${isActive ? 'active' : ''}`}>Home</NavLink>
           <NavLink to="/doctors" className={({isActive}) => `topbar-tab ${isActive ? 'active' : ''}`}>All Doctors</NavLink>
           <NavLink to="/about"   className={({isActive}) => `topbar-tab ${isActive ? 'active' : ''}`}>About</NavLink>
-          <NavLink to="/contact" className={({isActive}) => `topbar-tab ${isActive ? 'active' : ''}`}>Contact</NavLink>
+          {user?.role === 'patient' && (
+            <>
+              <NavLink to="/live-queue-tracker" className={({isActive}) => `topbar-tab ${isActive ? 'active' : ''}`}>Live Queue Tracker</NavLink>
+              <NavLink to="/contact" className={({isActive}) => `topbar-tab ${isActive ? 'active' : ''}`}>Contact</NavLink>
+            </>
+          )}
         </nav>
 
         <div className="topbar-user">

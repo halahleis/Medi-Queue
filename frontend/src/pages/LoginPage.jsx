@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
+import PasswordInput from '../components/PasswordInput.jsx';
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -50,13 +51,15 @@ export default function LoginPage() {
         </div>
 
         <div className="field">
-          <label className="label">Password</label>
-          <input
-            className="input"
-            type="password"
+          <div className="row" style={{ justifyContent: 'space-between', marginBottom: 6 }}>
+            <label className="label" style={{ marginBottom: 0 }}>Password</label>
+            <Link to="/forgot-password" style={{ fontSize: 12, fontWeight: 600 }}>Forgot password?</Link>
+          </div>
+          <PasswordInput
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
+            autoComplete="current-password"
           />
         </div>
 
@@ -70,7 +73,7 @@ export default function LoginPage() {
         </div>
 
         <div className="login-hint">
-          <strong>Demo accounts (password: password123):</strong><br />
+          <strong>Demo accounts (password: Password123!):</strong><br />
           Staff: maria@mediqueue.test<br />
           Admin: admin@mediqueue.test
         </div>

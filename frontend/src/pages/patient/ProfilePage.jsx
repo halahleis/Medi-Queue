@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import api from '../../api/client';
+import PhoneInput from '../../components/PhoneInput.jsx';
+import { findCountry, parseInternationalPhone, validateNationalPhone } from '../../utils/formValidation';
 
 const BLOOD_TYPES = ['', 'A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
 
@@ -32,11 +34,25 @@ export default function ProfilePage() {
 
   useEffect(() => { load(); }, []);
 
-  if (!form) return <div className="patient-page"><div className="empty">Loading…</div></div>;
+  if (!form) return <div className="patient-page"><div className="empty">Loading...</div></div>;
 
   const upd = (k, v) => setForm((f) => ({ ...f, [k]: v }));
 
   const onSave = async () => {
+    const phoneParsed = parseInternationalPhone(form.phone);
+    const phoneError = validateNationalPhone(findCountry(phoneParsed.countryCode), phoneParsed.nationalNumber);
+    if (phoneError) {
+      toast.error(phoneError);
+      return;
+    }
+
+    const emergencyParsed = parseInternationalPhone(form.emergencyContactPhone);
+    const emergencyPhoneError = validateNationalPhone(findCountry(emergencyParsed.countryCode), emergencyParsed.nationalNumber);
+    if (emergencyPhoneError) {
+      toast.error(`Emergency contact: ${emergencyPhoneError}`);
+      return;
+    }
+
     setBusy(true);
     try {
       await api.put('/patient/profile', form);
@@ -50,29 +66,6 @@ export default function ProfilePage() {
     }
   };
 
-  const Field = ({ label, k, type = 'text', readOnly = false, textarea = false }) => (
-    <div>
-      <label className="label">{label}</label>
-      {textarea ? (
-        <textarea
-          className="input"
-          rows={2}
-          value={form[k] || ''}
-          onChange={(e) => upd(k, e.target.value)}
-          disabled={!editing || readOnly}
-        />
-      ) : (
-        <input
-          className="input"
-          type={type}
-          value={form[k] || ''}
-          onChange={(e) => upd(k, e.target.value)}
-          disabled={!editing || readOnly}
-        />
-      )}
-    </div>
-  );
-
   return (
     <div className="patient-page">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 }}>
@@ -83,7 +76,7 @@ export default function ProfilePage() {
           <div className="row">
             <button className="btn btn-ghost btn-sm" onClick={() => { setEditing(false); load(); }}>Cancel</button>
             <button className="btn btn-primary btn-sm" disabled={busy} onClick={onSave}>
-              {busy ? 'Saving…' : 'Save changes'}
+              {busy ? 'Saving...' : 'Save changes'}
             </button>
           </div>
         )}
@@ -94,9 +87,9 @@ export default function ProfilePage() {
           Contact information
         </h3>
         <div className="profile-grid">
-          <Field label="Full name" k="fullName" />
-          <Field label="Email" k="email" readOnly />
-          <Field label="Phone" k="phone" />
+          <ProfileField label="Full name" value={form.fullName} onChange={(value) => upd('fullName', value)} editing={editing} />
+          <ProfileField label="Email" value={form.email} onChange={(value) => upd('email', value)} editing={editing} readOnly />
+          <PhoneInput value={form.phone} onChange={(value) => upd('phone', value)} disabled={!editing} />
         </div>
 
         <h3 style={{ fontSize: 13, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em', margin: '24px 0 14px' }}>
@@ -111,30 +104,60 @@ export default function ProfilePage() {
               onChange={(e) => upd('bloodType', e.target.value)}
               disabled={!editing}
             >
-              {BLOOD_TYPES.map((b) => <option key={b} value={b}>{b || '— select —'}</option>)}
+              {BLOOD_TYPES.map((b) => <option key={b} value={b}>{b || '-- select --'}</option>)}
             </select>
           </div>
-          <Field label="Allergies" k="allergies" textarea />
-          <Field label="Chronic conditions" k="chronicConditions" textarea />
-          <Field label="Current medications" k="currentMedications" textarea />
+          <ProfileField label="Allergies" value={form.allergies} onChange={(value) => upd('allergies', value)} editing={editing} textarea />
+          <ProfileField label="Chronic conditions" value={form.chronicConditions} onChange={(value) => upd('chronicConditions', value)} editing={editing} textarea />
+          <ProfileField label="Current medications" value={form.currentMedications} onChange={(value) => upd('currentMedications', value)} editing={editing} textarea />
         </div>
 
         <h3 style={{ fontSize: 13, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em', margin: '24px 0 14px' }}>
           Insurance
         </h3>
         <div className="profile-grid">
-          <Field label="Insurance provider" k="insuranceProvider" />
-          <Field label="Insurance number" k="insuranceNumber" />
+          <ProfileField label="Insurance provider" value={form.insuranceProvider} onChange={(value) => upd('insuranceProvider', value)} editing={editing} />
+          <ProfileField label="Insurance number" value={form.insuranceNumber} onChange={(value) => upd('insuranceNumber', value)} editing={editing} />
         </div>
 
         <h3 style={{ fontSize: 13, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em', margin: '24px 0 14px' }}>
           Emergency contact
         </h3>
         <div className="profile-grid">
-          <Field label="Contact name" k="emergencyContactName" />
-          <Field label="Contact phone" k="emergencyContactPhone" />
+          <ProfileField label="Contact name" value={form.emergencyContactName} onChange={(value) => upd('emergencyContactName', value)} editing={editing} />
+          <PhoneInput
+            label="Contact phone"
+            value={form.emergencyContactPhone}
+            onChange={(value) => upd('emergencyContactPhone', value)}
+            disabled={!editing}
+          />
         </div>
       </div>
+    </div>
+  );
+}
+
+function ProfileField({ label, value, onChange, type = 'text', readOnly = false, textarea = false, editing }) {
+  return (
+    <div>
+      <label className="label">{label}</label>
+      {textarea ? (
+        <textarea
+          className="input"
+          rows={2}
+          value={value || ''}
+          onChange={(e) => onChange(e.target.value)}
+          disabled={!editing || readOnly}
+        />
+      ) : (
+        <input
+          className="input"
+          type={type}
+          value={value || ''}
+          onChange={(e) => onChange(e.target.value)}
+          disabled={!editing || readOnly}
+        />
+      )}
     </div>
   );
 }
